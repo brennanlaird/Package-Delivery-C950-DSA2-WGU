@@ -16,36 +16,61 @@ class PackageHashTable:
             self.table.append([])
 
     # Inserts a new package into the hash table.
-    def insertPackage(self, item):
+    def insertPackage(self, id, address, city, state, zip, deadline, mass, notes):
         # get the bucket list where this item will go.
-        bucket = hash(item) % len(self.table)
+
+        bucket = hash(id) % len(self.table)
         bucket_list = self.table[bucket]
 
+        # Determine if the package ID is in the bucket list already
+        for i in bucket_list:
+            # Edits each item in the bucket list with the newly passed information IF the item is found in the list.
+            if i[0] == id:
+                i[1] = address
+                i[2] = city
+                i[3] = state
+                i[4] = zip
+                i[5] = deadline
+                i[6] = mass
+                i[7] = notes
+                return True
+
+        # if the id was not found, the information passed in is added to the variable then appended to the bucket list
+        new_package = [id, address, city, state, zip, deadline, mass, notes]
+
         # insert the package to the end of the bucket list.
-        bucket_list.append(item)
+        bucket_list.append(new_package)
 
     # Searches for an item with matching key in the hash table.
     # Returns the item if found, or None if not found.
-    def search(self, key):
+    def searchPackage(self, id):
         # get the bucket list where this key would be.
-        bucket = hash(key) % len(self.table)
+        bucket = hash(id) % len(self.table)
         bucket_list = self.table[bucket]
 
-        # search for the key in the bucket list
-        if key in bucket_list:
-            # find the item's index and return the item that is in the bucket list.
-            item_index = bucket_list.index(key)
-            return bucket_list[item_index]
-        else:
-            # the key is not found.
-            return None
+        # Iterates over the items in the bucket list
+        for package_item in bucket_list:
+
+            # search for the id in the current item
+            if id == package_item[0]:
+                # return the package object if it is found in the bucket list
+                return package_item
+
+        # the key is not found.
+        return None
 
     # Removes an item with matching key from the hash table.
-    def remove(self, key):
+    def removePackage(self, id):
         # get the bucket list where this item will be removed from.
-        bucket = hash(key) % len(self.table)
+        bucket = hash(id) % len(self.table)
         bucket_list = self.table[bucket]
 
-        # remove the item from the bucket list if it is present.
-        if key in bucket_list:
-            bucket_list.remove(key)
+        # Iterates over the items in the bucket list
+        for package_item in bucket_list:
+            # search for the id in the current item
+            if id == package_item[0]:
+                # if the id is found in the current item, remove it
+                bucket_list.remove(package_item)
+
+        # the id is not found.
+        return None
