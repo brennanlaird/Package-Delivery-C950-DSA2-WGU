@@ -34,10 +34,25 @@ def minDist(graph, address_dict, start_point):
                 finish_min = finish
     print(min_distance, " to ", finish_min)
 
-        #print(i)
-        #if start_point
 
+def next_nearest(truck, graph):
+    # Sets up the minimum as an arbritrary high value and sets the current location to the location of the truck.
+    min = 1000
+    current_loc = truck.currentLocation
 
-        # Store the distance
-        # Check if the distance is between current min and zero
-        # Swap into min
+    # For loop finds the minimum next distance among all the packages loaded on the truck.
+    for package in truck.truck_content:
+        # Pull the next address index from the current package.
+        next_location = package[10]
+        # x represents a tuple of the current and next location that is then pulled from the graph edge weights.
+        x = current_loc, next_location
+        next_distance = graph.edge_weights.get(x)
+
+        # If the next distance is less than the minimum, set that to be the next location to deliver to.
+        if next_distance < min:
+            min = next_distance
+            next_stop = next_location
+            # Gets the index location of the current package in the truck.
+            index = truck.truck_content.index(package)
+    # Returns the trucks next stop and the index location of the package
+    return next_stop, index
