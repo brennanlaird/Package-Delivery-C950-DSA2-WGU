@@ -7,6 +7,7 @@ import csv
 from packHash import *
 from packClass import *
 from graphClass import *
+from truckClass import *
 
 from distanceLookup import *
 
@@ -30,7 +31,7 @@ if __name__ == '__main__':
             1 - Store the line data as a temporary object
             2 - Add that temp object to the hash table
             '''
-            temp_package = Package(line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7])
+            temp_package = Package(line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], 0)
 
             # Converts the package id from a string to an integer value.
             # The conversion resulted in more predictable hashing and improved the ability to search.
@@ -38,7 +39,8 @@ if __name__ == '__main__':
 
             PackageHashTable.insertPackage(packageTable, temp_package.id, temp_package.address,
                                                     temp_package.city, temp_package.state, temp_package.zip,
-                                                    temp_package.deadline, temp_package.mass, temp_package.notes)
+                                                    temp_package.deadline, temp_package.mass, temp_package.notes,
+                                           temp_package.truck)
 
     # Create a new graph structure to store the distance table
     graphSLC = Graph()
@@ -56,7 +58,6 @@ if __name__ == '__main__':
         # Sets up a blank distance table to store the distances
         # Items will be indexed based on the address ID pulled from the CSV
         distance_table = []
-
 
         # Sets the initial address ID to zero
         address_id = 0
@@ -85,73 +86,54 @@ if __name__ == '__main__':
             # Increments the address ID for the next loop iteration
             address_id += 1
 
-    max = len(distance_table)
+    # Set of nested for loops to read the information stored in the distance table list
+    # and create undirected graph edges.
 
+    # The distance table is a list of lists and thus the first for loop iterates through each outer item.
     for outer_item in distance_table:
         # Get the index
         outer_index = distance_table.index(outer_item)
-        i = 0
-        print(outer_index)
 
-        item_len = len(distance_table[outer_index])
+        # This index is used to track the index on the inner list in the distance table.
+        # The inner index is reset to zero each time a new outer item is iterated over.
+        inner_index = 0
 
-        while len(distance_table[outer_index][i]) != 0 and outer_index < item_len:
-            # Create a new edge
-            test = float(distance_table[outer_index][i])
-            graphSLC.add_undirected_edge(outer_index, i, float(distance_table[outer_index][i]))
-
-            i += 1
-            #test1=len(distance_table[outer_index][i])
-            #test2=distance_table[outer_index][i]
-
-
-            # print(distance_table[outer_index][i])
-
-    '''
-    for outer_item in distance_table:
-        # Get the index
-        outer_index = distance_table.index(outer_item)
+        # Each inner list is iterated over to read the item stored.
+        # If the item is a valid distance, and undirected graph edge is created.
         for inner_item in distance_table[outer_index]:
-            if inner_item != '':
-                inner_index = outer_item.index(inner_item)
-                #graphSLC.add_undirected_edge(outer_index,)
-                print(inner_index)
 
-            #print(packageTable.table)
-            #print(line)
-        #print(packageTable.table)
-    print(distance_dict)
-    #print(distance_table[25])
-    '''
-    print(graphSLC.adjacency_list)
+            # Create a new edge if the distance is not blank
+            if distance_table[outer_index][inner_index] != '':
+                graphSLC.add_undirected_edge(outer_index, inner_index, float(distance_table[outer_index][inner_index]))
 
-    lookUp(distance_table,distance_dict,8,9)
+            # Increment the inner index counter.
+            inner_index += 1
 
-    lookUp(distance_table,distance_dict,9,1)
+    # Test code to verify distances via the lookup function,.
+    # print(graphSLC.adjacency_list)
+    # print(graphSLC.edge_weights)
 
-    lookUp(distance_table,distance_dict,4,15)
+    print(PackageHashTable.searchPackage(packageTable,1))
 
-    lookUp(distance_table,distance_dict,6,6)
+    # Define a new truck with ID 1, located at the hub, with an average speed of 18 mph, and capacity of 16 packages.
+    truck1 = Truck(1, 0, 18, 16, [])
 
-'''
-temp = packageTable.searchPackage(8)
-print(temp)
+    load_truck(truck1, packageTable)
 
-PackageHashTable.insertPackage(packageTable, 41, '123 Fake St', 'Provo', 'UT', '12345', 'EOD', '99', '')
+    print(truck1.truck_content)
 
-temp = packageTable.searchPackage(41)
-print(temp)
+    deliver_packages(truck1, distance_dict)
 
-PackageHashTable.insertPackage(packageTable, 41, 'Insert Check', 'Provo', 'UT', '12345', 'EOD', '99', '')
+    # print(minDist(graphSLC, distance_dict, 5))
 
-temp = packageTable.searchPackage(41)
-print(temp)
+    #lookUp(distance_table,distance_dict,8,9)
 
-packageTable.removePackage(41)
+    #lookUp(distance_table,distance_dict,9,1)
 
-temp = packageTable.searchPackage(41)
-print(temp)
-'''
+    #lookUp(distance_table,distance_dict,4,15)
+
+    #lookUp(distance_table,distance_dict,6,6)
+
 
 
 

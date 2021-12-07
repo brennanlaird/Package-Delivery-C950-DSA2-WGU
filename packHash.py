@@ -16,7 +16,7 @@ class PackageHashTable:
             self.table.append([])
 
     # Inserts a new package into the hash table.
-    def insertPackage(self, id, address, city, state, zip, deadline, mass, notes):
+    def insertPackage(self, id, address, city, state, zip, deadline, mass, notes, truck):
         # get the bucket list where this item will go.
 
         bucket = hash(id) % len(self.table)
@@ -33,10 +33,11 @@ class PackageHashTable:
                 i[5] = deadline
                 i[6] = mass
                 i[7] = notes
+                i[8] = truck
                 return True
 
         # if the id was not found, the information passed in is added to the variable then appended to the bucket list
-        new_package = [id, address, city, state, zip, deadline, mass, notes]
+        new_package = [id, address, city, state, zip, deadline, mass, notes, truck]
 
         # insert the package to the end of the bucket list.
         bucket_list.append(new_package)
@@ -74,3 +75,5 @@ class PackageHashTable:
 
         # the id is not found.
         return None
+
+
