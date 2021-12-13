@@ -1,3 +1,6 @@
+from datetime import timedelta, datetime
+
+import status_output
 from distanceLookup import next_nearest
 from packHash import *
 from packClass import *
@@ -5,13 +8,14 @@ from packClass import *
 
 class Truck:
     # Define the truck object constructor.
-    def __init__(self, truck_id, currentLocation, speed, capacity, truck_content, distance_traveled):
+    def __init__(self, truck_id, currentLocation, speed, capacity, truck_content, distance_traveled, truck_time):
         self.truck_id = truck_id
         self.currentLocation = currentLocation
         self.speed = speed
         self.capacity = capacity
         self.truck_content = []
         self.distance_traveled = distance_traveled
+        self.truck_time = truck_time
 
 
 # Any functions go here
@@ -25,10 +29,40 @@ def load_truck(truck, pack_table):
         pc += 1
 
 
-def deliver_packages(truck, graph):
+def deliver_packages(truck, graph, pack_table):
+    # Package count is based on the length of the truck content list.
     pc = len(truck.truck_content)
+
+    # Sets the current time to the base time from the truck object and converts it to a datetime object.
+    current_time = datetime.strptime(truck.truck_time, "%I:%M %p")
+
+    # Current package counter to iterate through items
+    cp = 0
+
+    # Updates the package status to out for delivery when the truck leaves the hub.
+    for package in truck.truck_content:
+
+        # Get the most current package information from the hash table.
+        package = pack_table.searchPackage(package[0])
+
+        # Update the package status.
+        package[9] = 'Out for delivery'
+
+        # Updates the truck content  with the latest info from the hash table.
+        # This ensures any address corrections are accounted for in the nearest neighbor delivery algorithm.
+        for i in range(10):
+            truck.truck_content[cp][i] = package[i]
+
+
+        # Insert the updated status back into the hash table.
+        pack_table.insertPackage(package[0], package[1], package[2], package[3], package[4], package[5], package[6],
+                                 package[7], package[8], package[9], package[10],)
+        cp += 1
+
+
+
     while pc > 0:
-        # Find the package with the minimum distance
+        # Find the package with the  next soonest delivery time and minimum distance.
         next_stop, index = next_nearest(truck, graph)
 
         # Pop the package with the shortest distance
@@ -45,9 +79,47 @@ def deliver_packages(truck, graph):
         # Add the edge weight to the distance traveled by the truck.
         truck.distance_traveled = truck.distance_traveled + distance_to_next
 
+        # Update the truck time
+        # Computes travel time in hours.
+        travel_time = distance_to_next / truck.speed
+
+        # Sets the current time based on the travel time. Travel time is converted into minutes.
+        current_time = current_time + timedelta(minutes=travel_time * 60)
+
+        # Triggers a function to print the package status to a file at a given time.
+        # Hard codes trigger times based on the performance assessment rubric.
+        # Section G1 - Time between 8:35 and 9:25 AM
+        trigger_time1 = datetime.strptime('8:45 AM', "%I:%M %p")
+
+        # Section G2 - Time between :35 and 10:25 AM
+        trigger_time2 = datetime.strptime('9:45 AM', "%I:%M %p")
+
+        # Section G3 - Time between 12:03 and 1:12 PM
+        trigger_time3 = datetime.strptime('12:10 PM', "%I:%M %p")
+
+        temp_truck_time = current_time - timedelta(minutes=travel_time*60)
+        # print(type(truck.truck_time))
+
+
+        if current_time >= trigger_time1 > temp_truck_time:
+             status_output.print_status(current_time, pack_table)
+
+        if current_time >= trigger_time2 > temp_truck_time:
+             status_output.print_status(current_time, pack_table)
+
+        if current_time >= trigger_time3 > temp_truck_time:
+             status_output.print_status(current_time, pack_table)
+
+        # Sets the truck time to match the current time.
+        truck.truck_time = current_time
+
         # Set the status of the current package to delivered
-        # TODO This only updates on board the truck, needs to update the hash table as well.
-        current_package[9] = 'delivered'
+        current_package[9] = 'delivered at ' + current_time.strftime("%I:%M %p")
+
+        # Updates the delivery status in the hash table.
+        pack_table.insertPackage(current_package[0], current_package[1], current_package[2], current_package[3],
+                                 current_package[4], current_package[5], current_package[6], current_package[7],
+                                 current_package[8], current_package[9], current_package[10])
 
         # Update the trucks current location to that of the current package.
         truck.currentLocation = current_package[10]
@@ -61,7 +133,6 @@ def deliver_packages(truck, graph):
     truck.currentLocation = 0
 
     print("Truck", truck.truck_id, "travelled", round(truck.distance_traveled, 2), "miles.")
-    print("Truck", truck.truck_id, " took", round(truck.distance_traveled / truck.speed, 2), "hours")
 
 
 # Defines a manual scheme for loading trucks.
@@ -75,6 +146,7 @@ def manual_load_truck(pack_table, pc):
         current_package = PackageHashTable.searchPackage(pack_table, current_id)
 
         current_package[8] = truck_loading[current_id - 1]
+        current_package[9] = 'At Hub - Loaded on delivery vehicle'
 
         PackageHashTable.insertPackage(pack_table, current_package[0], current_package[1],
                                        current_package[2], current_package[3], current_package[4],
@@ -82,6 +154,7 @@ def manual_load_truck(pack_table, pc):
                                        current_package[8], current_package[9], current_package[10])
 
         current_id += 1
+
 
 def manual_distribute(truck, pack_table, package_count):
     # Counts how many packages are loaded onto the truck.

@@ -135,9 +135,9 @@ if __name__ == '__main__':
     manual_load_truck(packageTable, pc)
 
     # Define a new truck with ID 1, located at the hub, with an average speed of 18 mph, and capacity of 16 packages.
-    truck1 = Truck(1, 0, 18, 16, [], 0)
-    truck2 = Truck(2, 0, 18, 16, [], 0)
-    truck3 = Truck(3, 0, 18, 16, [], 0)
+    truck1 = Truck(1, 0, 18, 16, [], 0, '8:00 AM')
+    truck2 = Truck(2, 0, 18, 16, [], 0, '9:05 AM')
+    truck3 = Truck(3, 0, 18, 16, [], 0, '10:20 AM')
 
     manual_distribute(truck1, packageTable, pc)
     manual_distribute(truck2, packageTable, pc)
@@ -152,10 +152,55 @@ if __name__ == '__main__':
 
     # print(truck1.truck_content)
 
-    deliver_packages(truck1, graphSLC)
-    deliver_packages(truck2, graphSLC)
-    deliver_packages(truck3, graphSLC)
+    deliver_packages(truck1, graphSLC, packageTable)
+    deliver_packages(truck2, graphSLC, packageTable)
 
+    # Updates the address for package #9 to correct address.
+
+    # Finds the package ID in the hash table
+    update_package = packageTable.searchPackage(9)
+
+    # Updates the package address fields.
+    update_package[1] = '410 S State St'
+    update_package[2] = 'Salt Lake City'
+    update_package[3] = 'UT'
+    update_package[4] = '84111'
+    update_package[7] = 'Address corrected'
+
+    # Search through the dictionary to find the address associated with the package to be updated.
+    for key in distance_dict:
+
+        # if the address from the package is found, update the address id for the package and break the loop.
+        if update_package[1] in distance_dict[key]['Name']:
+            update_package[10] = key
+            break
+        if update_package[1] in distance_dict[key]['Address']:
+            update_package[10] = key
+            break
+
+    # Updates the packages in the hash table.
+    packageTable.insertPackage(update_package[0], update_package[1], update_package[2], update_package[3],
+                               update_package[4], update_package[5], update_package[6], update_package[7],
+                               update_package[8], update_package[9], update_package[10])
+
+
+    # Update truck 3 departure time so it is the time that the first truck returns to the hub.
+
+    next_departure = min(truck1.truck_time, truck2.truck_time)
+
+    if next_departure > datetime.strptime(truck3.truck_time, "%I:%M %p"):
+        truck3.truck_time = next_departure.strftime("%I:%M %p")
+
+    deliver_packages(truck3, graphSLC, packageTable)
+
+    end_time = max(truck1.truck_time, truck2.truck_time, truck3.truck_time)
+    total_distance = truck1.distance_traveled + truck2.distance_traveled + truck3.distance_traveled
+
+
+    print("")
+    print("----FINAL RESULT----")
+    print("Total Distance Travelled: ", round(total_distance, 2), "miles")
+    print("Day finished at ", end_time.strftime("%I:%M %p"))
     # Test code to verify program functionality.
     # Called from functions written in the test code module.
 

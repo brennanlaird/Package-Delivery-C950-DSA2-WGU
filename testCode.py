@@ -29,6 +29,7 @@ def package_print(packtable):
     while pc < 41:
         print(packtable.searchPackage(pc))
         pc += 1
+    print("Stop sign")
 
 def package_deadline(packtable, pc):
     # Create a list of packages to be loaded based on a nested set of functions
@@ -50,8 +51,8 @@ def package_deadline(packtable, pc):
 
     # if a same address is found, check the restrictions
 
-def same_address(packtable, pc, id):
 
+def same_address(packtable, pc, id):
     j = 1
     while j <= pc:
         cp = packtable.searchPackage(j)
