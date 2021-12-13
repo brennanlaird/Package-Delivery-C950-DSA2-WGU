@@ -4,13 +4,8 @@ WGU ID#: 001415733
 '''
 
 import csv
-from packHash import *
-from packClass import *
-from graphClass import *
-from truckClass import *
-from testCode import *  # Code to test program functionality
 
-from distanceLookup import *
+from testCode import *  # Code to test program functionality
 
 if __name__ == '__main__':
 
@@ -29,21 +24,22 @@ if __name__ == '__main__':
 
         # For each line in the CSV, create a new package object and store it in the hash table.
         for line in package_data:
-            '''
-            1 - Store the line data as a temporary object
-            2 - Add that temp object to the hash table
-            '''
+            # Creates a temporary package object from each line of the file.
+            # Additional default values are included at the end for the package object.
             temp_package = Package(line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], 0, 0, -1)
 
             # Converts the package id from a string to an integer value.
             # The conversion resulted in more predictable hashing and improved the ability to search.
             temp_package.id = int(temp_package.id)
 
-            PackageHashTable.insertPackage(packageTable, temp_package.id, temp_package.address,
-                                           temp_package.city, temp_package.state, temp_package.zip,
-                                           temp_package.deadline, temp_package.mass, temp_package.notes,
-                                           temp_package.truck, temp_package.status, temp_package.address_id)
+            # Insert the temporary package into the hash table.
+            packageTable.insertPackage(temp_package.id, temp_package.address,
+                                       temp_package.city, temp_package.state, temp_package.zip,
+                                       temp_package.deadline, temp_package.mass, temp_package.notes,
+                                       temp_package.truck, temp_package.status, temp_package.address_id)
+             # Increment the package count by 1.
             pc += 1
+
     # Create a new graph structure to store the distance table
     graphSLC = Graph()
 
@@ -135,19 +131,38 @@ if __name__ == '__main__':
                 break
         i += 1
 
-
+    # Executes the manual load scheme on the packages by assigning the predefined truck ID to the package ID.
+    manual_load_truck(packageTable, pc)
 
     # Define a new truck with ID 1, located at the hub, with an average speed of 18 mph, and capacity of 16 packages.
     truck1 = Truck(1, 0, 18, 16, [], 0)
+    truck2 = Truck(2, 0, 18, 16, [], 0)
+    truck3 = Truck(3, 0, 18, 16, [], 0)
 
-    load_truck(truck1, packageTable)
+    manual_distribute(truck1, packageTable, pc)
+    manual_distribute(truck2, packageTable, pc)
+    manual_distribute(truck3, packageTable, pc)
 
-    print(truck1.truck_content)
+    # for item in truck3.truck_content:
+        # print(item)
+
+    # load_truck(truck1, packageTable)
+    # load_truck(truck2, packageTable)
+    # load_truck(truck3, packageTable)
+
+    # print(truck1.truck_content)
 
     deliver_packages(truck1, graphSLC)
+    deliver_packages(truck2, graphSLC)
+    deliver_packages(truck3, graphSLC)
 
     # Test code to verify program functionality.
     # Called from functions written in the test code module.
+
+    # Testing the package loading code
+    # package_deadline(packageTable,pc)
+
+    # manual_load_truck(packageTable, pc)
 
     # Check the edges and adjacency lists
     # graph_print(graphSLC)
