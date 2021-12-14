@@ -1,57 +1,12 @@
-'''
-Student: Brennan Laird
-WGU ID#: 001415733
-'''
-
 import csv
 
-from delivery_main import delivery_main
 from graphClass import *
-from interface import display_main, display_submenu, submenu_functionality
 from packClass import *
 from packHash import *
 from truckClass import *
 
-if __name__ == '__main__':
+def delivery_main():
 
-    # Displays the main menu.
-    display_main()
-
-    valid_input = False
-
-
-    # TODO fix error catching for invalid input.
-    while(valid_input == False):
-
-        # Gets the users input from the console and converts it to an integer.
-        main_menu_input = int(input("Enter the number to proceed with the menu choice."))
-
-        if main_menu_input == 1:
-            # Runs the main delivery program.
-            valid_input = True
-            delivery_main()
-            exit(0)
-        elif main_menu_input == 2:
-            # launch the sub menu
-            display_submenu()
-            valid_input = submenu_functionality()
-            # Displays the main menu.
-            display_main()
-        elif main_menu_input == 3:
-            # Exits the program.
-            valid_input = True
-            exit(0)
-        else:
-            # Flags an invalid input and re-displays the main menu.
-            print("Invalid input, try again.")
-            print("")
-
-            # TODO clear the console?.
-            display_main()
-            # Gets the users input from the console.
-            main_menu_input = input("Enter the number to proceed with the menu choice.")
-
-'''
     # Creates a new empty package hash table.
     packageTable = PackageHashTable()
 
@@ -272,4 +227,3 @@ if __name__ == '__main__':
     # lookUp(distance_table,distance_dict,4,15)
 
     # lookUp(distance_table,distance_dict,6,6)
-    '''

@@ -2,42 +2,9 @@ from graphClass import *
 from datetime import datetime
 
 
-def lookUp(list, dict, v1, v2):
-    print("Distance between:")
-    print(dict[v1]['Name'])
-    print("and")
-    print(dict[v2]['Name'])
-
-    if v1 > v2:
-        v1, v2 = v2, v1
-
-    print(list[v2][v1])
-
-
-def minDist(graph, address_dict, start_point):
-    print("Starting Index: ", start_point)
-    print("Starting Address: ", address_dict.get(start_point))
-    print(" ")
-    print("Next Closest Point:")
-
-    min_distance = 1000
-    finish_min = start_point
-
-    for i in graph.edge_weights:
-        # is the start point in the key
-        start, finish = i
-
-        distance = graph.edge_weights.get(i)
-        if start == start_point:
-            # print("Start: ", start, " Finish: ", finish, " Distance between: ", distance)
-
-            if distance > 0 and distance < min_distance:
-                min_distance = distance
-                finish_min = finish
-    print(min_distance, " to ", finish_min)
-
-
 # This code finds the nearest vertex to the current truck location using a nearst neighbor algorithm.
+# It first defines the next soonest delivery time found in the truck and among packages due to be delivered soonest,
+# the algorithm finds the next shortest distance.
 def next_nearest(truck, graph):
     # Sets up the minimum as an arbitrary high value and sets the current location to the location of the truck.
     min = 1000
@@ -80,7 +47,8 @@ def next_nearest(truck, graph):
         x = current_loc, next_location
         next_distance = graph.edge_weights.get(x)
 
-        # If the next distance is less than the minimum, set that to be the next location to deliver to.
+        # If the next distance is less than the minimum, set that to be the next location to deliver to if the
+        # next deadline is equal to the minimum. This allows for both time and distance to be considered.
         if next_distance < min and next_deadline == min_time:
             min = next_distance
             next_stop = next_location

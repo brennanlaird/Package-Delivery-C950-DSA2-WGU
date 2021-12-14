@@ -18,17 +18,6 @@ class Truck:
         self.truck_time = truck_time
 
 
-# Any functions go here
-def load_truck(truck, pack_table):
-    pc = 0
-
-    # truck_packages = []
-    while pc < truck.capacity:
-        # TODO Change the status of the loaded package in the hash table when it is loaded.
-        truck.truck_content.append(PackageHashTable.searchPackage(pack_table, pc + 1))
-        pc += 1
-
-
 def deliver_packages(truck, graph, pack_table):
     # Package count is based on the length of the truck content list.
     pc = len(truck.truck_content)
@@ -53,13 +42,10 @@ def deliver_packages(truck, graph, pack_table):
         for i in range(10):
             truck.truck_content[cp][i] = package[i]
 
-
         # Insert the updated status back into the hash table.
         pack_table.insertPackage(package[0], package[1], package[2], package[3], package[4], package[5], package[6],
-                                 package[7], package[8], package[9], package[10],)
+                                 package[7], package[8], package[9], package[10], )
         cp += 1
-
-
 
     while pc > 0:
         # Find the package with the  next soonest delivery time and minimum distance.
@@ -91,24 +77,23 @@ def deliver_packages(truck, graph, pack_table):
         # Section G1 - Time between 8:35 and 9:25 AM
         trigger_time1 = datetime.strptime('8:45 AM', "%I:%M %p")
 
-        # Section G2 - Time between :35 and 10:25 AM
+        # Section G2 - Time between 9:35 and 10:25 AM
         trigger_time2 = datetime.strptime('9:45 AM', "%I:%M %p")
 
         # Section G3 - Time between 12:03 and 1:12 PM
         trigger_time3 = datetime.strptime('12:10 PM', "%I:%M %p")
 
-        temp_truck_time = current_time - timedelta(minutes=travel_time*60)
+        temp_truck_time = current_time - timedelta(minutes=travel_time * 60)
         # print(type(truck.truck_time))
 
-
         if current_time >= trigger_time1 > temp_truck_time:
-             status_output.print_status(current_time, pack_table)
+            status_output.print_status(current_time, pack_table, truck, trigger_time1, trigger_time2, trigger_time3)
 
         if current_time >= trigger_time2 > temp_truck_time:
-             status_output.print_status(current_time, pack_table)
+            status_output.print_status(current_time, pack_table, truck, trigger_time1, trigger_time2, trigger_time3)
 
         if current_time >= trigger_time3 > temp_truck_time:
-             status_output.print_status(current_time, pack_table)
+            status_output.print_status(current_time, pack_table, truck, trigger_time1, trigger_time2, trigger_time3)
 
         # Sets the truck time to match the current time.
         truck.truck_time = current_time
@@ -137,51 +122,47 @@ def deliver_packages(truck, graph, pack_table):
 
 # Defines a manual scheme for loading trucks.
 def manual_load_truck(pack_table, pc):
+    # Set the current id to 1, the first package in the list.
     current_id = 1
 
+    # Truck loading scheme determined by the programmer. This is included here to avoid modifying the CSV
+    # file.
     truck_loading = [2, 2, 2, 1, 2, 2, 1, 1, 3, 2, 2, 3, 1, 1, 1, 1, 3, 2, 1, 1, 1, 3, 3, 3, 2, 2, 3, 2, 1, 1, 1, 2, 2,
                      1, 3, 2, 2, 2, 1, 1]
 
+    # While the current ID is less than the package count.
     while current_id <= pc:
+        # Gets the current ID from the hash table and stores the list as the current package.
         current_package = PackageHashTable.searchPackage(pack_table, current_id)
 
+        # Sets the truck ID from the truck loading scheme based on the index of that list.
         current_package[8] = truck_loading[current_id - 1]
+
+        # Sets the package status.
         current_package[9] = 'At Hub - Loaded on delivery vehicle'
 
+        # Updates the package in the hash table.
         PackageHashTable.insertPackage(pack_table, current_package[0], current_package[1],
                                        current_package[2], current_package[3], current_package[4],
                                        current_package[5], current_package[6], current_package[7],
                                        current_package[8], current_package[9], current_package[10])
-
+        # Increments the package id for the while loop
         current_id += 1
 
-
+# Distributes the packages to the trucks content lists.
 def manual_distribute(truck, pack_table, package_count):
     # Counts how many packages are loaded onto the truck.
     loaded_count = 0
 
-    # List for debugging
-    truck_packages = []
-
+    # Set the current id to 1, the first package in the list.
     current_id = 1
 
+    # While the current package id is less than the total package count.
     while current_id <= package_count:
+        # Gets the current ID from the hash table and stores the list as the current package.
         current_package = PackageHashTable.searchPackage(pack_table, current_id)
+        # If the current package is supposed to be on the current truck, add that package to the trucks content list.
         if current_package[8] == truck.truck_id:
             truck.truck_content.append(current_package)
             loaded_count += 1
         current_id += 1
-    '''
-    
-    while pc < truck.capacity:
-        # TODO Change the status of the loaded package in the hash table when it is loaded.
-
-        if PackageHashTable.searchPackage(pack_table, pc + 1)[8] == truck.truck_id:
-            truck.truck_content.append(PackageHashTable.searchPackage(pack_table, pc + 1))
-            truck_packages.append(PackageHashTable.searchPackage(pack_table, pc + 1))
-        # truck.truck_content.append(PackageHashTable.searchPackage(pack_table, pc + 1))
-            pc += 1
-        if PackageHashTable.searchPackage(pack_table, pc + 1)[0] == package_count:
-            pc = truck.capacity
-    
-    '''
