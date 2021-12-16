@@ -13,15 +13,18 @@ class Graph:
         self.edge_weights = {}
 
     # Adds a vertex to the adjacency list. The vertex will be represented on the address id pulled from the CSV file.
+    # Time Complexity O(1)  Space Complexity O(1)
     def add_vertex(self, new_vertex):
         self.adjacency_list[new_vertex] = []
 
     # Directed edge is added between two vertexes and includes an edge weight.
+    # Time Complexity O(1)  Space Complexity O(1)
     def add_directed_edge(self, from_vertex, to_vertex, weight=1.0):
         self.edge_weights[(from_vertex, to_vertex)] = weight
         self.adjacency_list[from_vertex].append(to_vertex)
 
     # Undirected graph edges are added by adding directed edges with the same vertexes and weights  in either order.
+    # Time Complexity O(1)  Space Complexity O(1)
     def add_undirected_edge(self, vertex_a, vertex_b, weight=1.0):
         self.add_directed_edge(vertex_a, vertex_b, weight)
         self.add_directed_edge(vertex_b, vertex_a, weight)

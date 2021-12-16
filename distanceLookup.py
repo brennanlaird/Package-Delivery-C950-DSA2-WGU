@@ -1,10 +1,10 @@
-from graphClass import *
 from datetime import datetime
 
 
 # This code finds the nearest vertex to the current truck location using a nearst neighbor algorithm.
 # It first defines the next soonest delivery time found in the truck and among packages due to be delivered soonest,
 # the algorithm finds the next shortest distance.
+# Time Complexity O(n)  Space Complexity O(1)
 def next_nearest(truck, graph):
     # Sets up the minimum as an arbitrary high value and sets the current location to the location of the truck.
     min = 1000
@@ -15,6 +15,7 @@ def next_nearest(truck, graph):
 
     # Finds the minimum delivery time for the packages on the truck.
     # This is used to prioritise the deadline first.
+    # Time Complexity O(n)  Space Complexity O(1)
     for package in truck.truck_content:
         # Gets the deadline of the package as a string.
         time_string = package[5]
@@ -30,6 +31,7 @@ def next_nearest(truck, graph):
             min_time = next_deadline
 
     # For loop finds the minimum next distance among all the packages loaded on the truck.
+    # Time Complexity O(n)  Space Complexity O(1)
     for package in truck.truck_content:
         # Pull the next address index from the current package.
         next_location = package[10]

@@ -16,6 +16,7 @@ class PackageHashTable:
             self.table.append([])
 
     # Inserts a new package into the hash table.
+    # Time Complexity O(n)  Space Complexity O(n)
     def insertPackage(self, id, address, city, state, zip, deadline, mass, notes, truck, status, address_id):
         # get the bucket list where this item will go.
         bucket = hash(id) % len(self.table)
@@ -45,6 +46,7 @@ class PackageHashTable:
 
     # Searches for an item with matching key in the hash table.
     # Returns the item if found, or None if not found.
+    # Time Complexity O(n)  Space Complexity O(1)
     def searchPackage(self, id):
         # get the bucket list where this key would be.
         bucket = hash(id) % len(self.table)
@@ -62,6 +64,7 @@ class PackageHashTable:
         return None
 
     # Removes an item with matching key from the hash table.
+    # Time Complexity O(n)  Space Complexity O(1)
     def removePackage(self, id):
         # get the bucket list where this item will be removed from.
         bucket = hash(id) % len(self.table)

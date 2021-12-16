@@ -2,15 +2,11 @@
 # Student: Brennan Laird
 # WGU ID#: 001415733
 
-
-import csv
+# FULL PROGRAM
+# Time Complexity O(n^2)  Space Complexity O(n)
 
 from delivery_main import delivery_main
-from graphClass import *
 from interface import display_main, display_submenu, submenu_functionality
-from packClass import *
-from packHash import *
-from truckClass import *
 
 if __name__ == '__main__':
 
@@ -21,6 +17,7 @@ if __name__ == '__main__':
     valid_input = False
 
     # Loop to check for a valid user input
+    # Time Complexity O(n)  Space Complexity O(1)
     while not valid_input:
         # try to convert the user input to an integer. If this works it loops through the menu functionality.
         try:

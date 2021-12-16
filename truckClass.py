@@ -1,9 +1,7 @@
 from datetime import timedelta, datetime
 from re import search
-
 from distanceLookup import next_nearest
 from packHash import *
-from packClass import *
 
 
 class Truck:
@@ -17,7 +15,8 @@ class Truck:
         self.distance_traveled = distance_traveled
         self.truck_time = truck_time
 
-
+# Function to deliver packages for a given truck.
+# Time Complexity O(n^2)  Space Complexity O(n)
 def deliver_packages(truck, graph, pack_table, endtime):
     # Package count is based on the length of the truck content list.
     pc = len(truck.truck_content)
@@ -38,6 +37,7 @@ def deliver_packages(truck, graph, pack_table, endtime):
     cp = 0
 
     # Updates the package status to out for delivery when the truck leaves the hub.
+    # Time Complexity O(n^2)  Space Complexity O(n)
     for package in truck.truck_content:
 
         # Get the most current package information from the hash table.
@@ -56,6 +56,8 @@ def deliver_packages(truck, graph, pack_table, endtime):
                                  package[7], package[8], package[9], package[10], )
         cp += 1
 
+    # Executes until there are no more packages in the truck.
+    # Time Complexity O(n)  Space Complexity O(n)
     while pc > 0:
         # Find the package with the  next soonest delivery time and minimum distance.
         next_stop, index = next_nearest(truck, graph)
@@ -68,8 +70,6 @@ def deliver_packages(truck, graph, pack_table, endtime):
 
         # Pull the distance (edge weight) of the pair from the graph.
         distance_to_next = graph.edge_weights.get(next_pair)
-
-        # distance_to_next = distance_to_next / 1
 
         # Add the edge weight to the distance traveled by the truck.
         truck.distance_traveled = truck.distance_traveled + distance_to_next
@@ -121,6 +121,7 @@ def deliver_packages(truck, graph, pack_table, endtime):
 
 
 # Defines a manual scheme for loading trucks.
+# Time Complexity O(n)  Space Complexity O(n)
 def manual_load_truck(pack_table, pc):
     # Set the current id to 1, the first package in the list.
     current_id = 1
@@ -154,6 +155,7 @@ def manual_load_truck(pack_table, pc):
 
 
 # Distributes the packages to the trucks content lists.
+# Time Complexity O(n)  Space Complexity O(1)
 def manual_distribute(truck, pack_table, package_count):
     # Counts how many packages are loaded onto the truck.
     loaded_count = 0

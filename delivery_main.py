@@ -1,10 +1,6 @@
 import csv
-
 import packClass
-from packClass import *
 from graphClass import *
-from packClass import *
-from packHash import *
 from truckClass import *
 
 
@@ -12,6 +8,7 @@ from truckClass import *
 # The end time is a string that is parsed into a datetime. This allows the function to stop running and display results
 # at a user specified time. Display results will cause the full package table to display. The get id parameter will
 # display the results of a single package if it is not 0.
+# Time Complexity O(n^2)  Space Complexity O(n)
 def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
     # Creates a new empty package hash table.
     packageTable = PackageHashTable()
@@ -20,6 +17,7 @@ def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
     pc = 0
 
     # Open and read the package csv file.
+    # Time Complexity O(n)  Space Complexity O(n)
     with open('WGUPS Package File.csv', 'r') as csv_file:
         package_data = csv.reader(csv_file)
 
@@ -30,7 +28,8 @@ def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
         for line in package_data:
             # Creates a temporary package object from each line of the file.
             # Additional default values are included at the end for the package object.
-            temp_package = Package(line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], 0, 0, -1)
+            temp_package = packClass.Package(line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], 0,
+                                             0, -1)
 
             # Converts the package id from a string to an integer value.
             # The conversion resulted in more predictable hashing and improved the ability to search.
@@ -48,6 +47,7 @@ def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
     graphSLC = Graph()
 
     # Open and read the distance file.
+    # Time Complexity O(n^2)  Space Complexity O(n)
     with open('WGUPS Distance Table.csv', 'r') as csv_file:
         distance_data = csv.reader(csv_file)
 
@@ -91,7 +91,7 @@ def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
 
     # Set of nested for loops to read the information stored in the distance table list
     # and create undirected graph edges.
-
+    # Time Complexity O(n^2)  Space Complexity O(n)
     # The distance table is a list of lists and thus the first for loop iterates through each outer item.
     for outer_item in distance_table:
         # Get the index
@@ -115,7 +115,7 @@ def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
     # This code iterates through each package in the hash table to modify the address ID
     # The address associated with the package is compared with the address in the distance dictionary.
     # When a matching address is found, the address ID of the package is updated.
-
+    # Time Complexity O(n^2)  Space Complexity O(n)
     # i is the counter for the while loop
     i = 1
 
@@ -153,7 +153,6 @@ def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
     # Executes the deliver packages function for truck 1.
     deliver_packages(truck1, graphSLC, packageTable, endtime)
 
-
     # Change the status of the delayed packages to loaded if the time is past the delayed arrival time.
 
     # Converts end time parameter to date time object.
@@ -161,6 +160,7 @@ def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
     delay_time = datetime.strptime('9:05 AM', "%I:%M %p")
 
     # If the end time is after the delayed time then the delayed packages will have arrived.
+    # Time Complexity O(n)  Space Complexity O(n)
     if end_time >= delay_time:
         # Change the delayed packages' status to loaded if they have arrived.
         # Start at package id 1
@@ -192,6 +192,7 @@ def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
         update_package[7] = 'Address corrected'
 
         # Search through the dictionary to find the address associated with the package to be updated.
+        # Time Complexity O(n)  Space Complexity O(n)
         for key in distance_dict:
 
             # if the address from the package is found, update the address id for the package and break the loop.

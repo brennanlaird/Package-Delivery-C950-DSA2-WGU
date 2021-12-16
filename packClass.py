@@ -16,6 +16,7 @@ class Package:
 
 
 # Function to print each package in the table.
+# Time Complexity O(n)  Space Complexity O(1)
 def package_print(packtable):
     # Set package id to 1.
     p_id = 1

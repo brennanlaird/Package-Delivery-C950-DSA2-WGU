@@ -1,10 +1,8 @@
 from datetime import datetime
-
-import packHash
 from delivery_main import delivery_main
-from packHash import PackageHashTable
 
 
+# Time Complexity O(1)  Space Complexity O(1)
 def display_main():
     # Text menu that offers choices to the user.
     print("")
@@ -16,6 +14,7 @@ def display_main():
     print("3 - EXIT")
 
 
+# Time Complexity O(1)  Space Complexity O(1)
 def display_submenu():
     # Text menu that offers choices to the user for the submenu.
     print("")
@@ -28,6 +27,7 @@ def display_submenu():
 
 
 # Function to take user input from the CL and implement the sub menu functionality.
+# Time Complexity O(n)  Space Complexity O(1)
 def submenu_functionality():
     # Set valid to false to loop through an obtain a valid user input.
     valid = False
@@ -81,6 +81,7 @@ def submenu_functionality():
 
 
 # Function to get a time input by the user inorder to display package status at that time.
+# Time Complexity O(n)  Space Complexity O(1)
 def get_time():
     # Sets valid input as false to loop until a valid entry is input
     valid_entry = False
@@ -111,6 +112,7 @@ def get_time():
 
 
 # Function to get a specific package id from the user.
+# Time Complexity O(n)  Space Complexity O(1)
 def get_package_id():
     # Sets valid input as false to loop until a valid entry is input
     valid_entry = False
