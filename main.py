@@ -36,7 +36,7 @@ if __name__ == '__main__':
             display_submenu()
             valid_input = submenu_functionality()
             # Displays the main menu.
-            display_main()
+            # display_main()
         elif main_menu_input == 3:
             # Exits the program.
             valid_input = True

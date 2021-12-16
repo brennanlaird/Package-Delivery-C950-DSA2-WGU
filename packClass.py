@@ -1,5 +1,4 @@
 
-
 class Package:
     # Define the package constructor based on the headers from the provided Excel file.
     # Additional parameters are for the truck to load the package, delivery status, and address ID.
@@ -15,3 +14,10 @@ class Package:
         self.truck = truck
         self.status = status
         self.address_id = address_id
+
+
+def package_print(packtable):
+    pc = 1
+    while pc < 41:
+        print(packtable.searchPackage(pc))
+        pc += 1

@@ -1,4 +1,5 @@
 from datetime import timedelta, datetime
+from re import search
 
 import status_output
 from distanceLookup import next_nearest
@@ -18,14 +19,23 @@ class Truck:
         self.truck_time = truck_time
 
 
-def deliver_packages(truck, graph, pack_table):
+def deliver_packages(truck, graph, pack_table, endtime):
     # Package count is based on the length of the truck content list.
     pc = len(truck.truck_content)
 
     # Sets the current time to the base time from the truck object and converts it to a datetime object.
     current_time = datetime.strptime(truck.truck_time, "%I:%M %p")
 
-    # Current package counter to iterate through items
+    # Convert the endtime parameter into a datetime object to conduct comparisons.
+    end_time = datetime.strptime(endtime, "%I:%M %p")
+
+    # If the current time is greater than the end time parameter, return to the main delivery function.
+    if current_time >= end_time:
+        # Sets the truck time to the current time. Ensures the truck time is a datetime object.
+        truck.truck_time = current_time
+        return
+
+        # Current package counter to iterate through items
     cp = 0
 
     # Updates the package status to out for delivery when the truck leaves the hub.
@@ -86,6 +96,11 @@ def deliver_packages(truck, graph, pack_table):
         temp_truck_time = current_time - timedelta(minutes=travel_time * 60)
         # print(type(truck.truck_time))
 
+        # if the current time passes the desired end time then return to the calling function.
+        if current_time >= end_time > temp_truck_time:
+            print("This triggered")
+            return
+
         if current_time >= trigger_time1 > temp_truck_time:
             status_output.print_status(current_time, pack_table, truck, trigger_time1, trigger_time2, trigger_time3)
 
@@ -117,7 +132,15 @@ def deliver_packages(truck, graph, pack_table):
     truck.distance_traveled = graph.edge_weights.get(truck.currentLocation, 0) + truck.distance_traveled
     truck.currentLocation = 0
 
-    print("Truck", truck.truck_id, "travelled", round(truck.distance_traveled, 2), "miles.")
+    # Update the truck time
+    # Computes travel time in hours.
+    travel_time = graph.edge_weights.get(truck.currentLocation, 0) / truck.speed
+
+    # Sets the current time based on the travel time. Travel time is converted into minutes.
+    current_time = current_time + timedelta(minutes=travel_time * 60)
+    truck.truck_time = current_time
+
+    # print("Truck", truck.truck_id, "travelled", round(truck.distance_traveled, 2), "miles.")
 
 
 # Defines a manual scheme for loading trucks.
@@ -139,7 +162,10 @@ def manual_load_truck(pack_table, pc):
         current_package[8] = truck_loading[current_id - 1]
 
         # Sets the package status.
-        current_package[9] = 'At Hub - Loaded on delivery vehicle'
+        if search('Delayed', current_package[7]):
+            current_package[9] = 'Delayed'
+        else:
+            current_package[9] = 'At Hub - Loaded on delivery vehicle'
 
         # Updates the package in the hash table.
         PackageHashTable.insertPackage(pack_table, current_package[0], current_package[1],
@@ -148,6 +174,7 @@ def manual_load_truck(pack_table, pc):
                                        current_package[8], current_package[9], current_package[10])
         # Increments the package id for the while loop
         current_id += 1
+
 
 # Distributes the packages to the trucks content lists.
 def manual_distribute(truck, pack_table, package_count):

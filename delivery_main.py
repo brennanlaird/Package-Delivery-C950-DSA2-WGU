@@ -1,12 +1,14 @@
 import csv
 
+import packClass
+from packClass import *
 from graphClass import *
 from packClass import *
 from packHash import *
 from truckClass import *
 
-def delivery_main():
 
+def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
     # Creates a new empty package hash table.
     packageTable = PackageHashTable()
 
@@ -152,78 +154,79 @@ def delivery_main():
 
     # print(truck1.truck_content)
 
-    deliver_packages(truck1, graphSLC, packageTable)
+    deliver_packages(truck1, graphSLC, packageTable, endtime)
 
-    # TODO Change the status of the delayed packages to loaded.
-    deliver_packages(truck2, graphSLC, packageTable)
+    # Change the status of the delayed packages to loaded if the time is past the delayed arrival time.
 
-    # Updates the address for package #9 to correct address.
+    # Converts end time parameter to date time object.
+    end_time = datetime.strptime(endtime, "%I:%M %p")
+    delay_time = datetime.strptime('9:05 AM', "%I:%M %p")
 
-    # Finds the package ID in the hash table
-    update_package = packageTable.searchPackage(9)
+    if end_time >= delay_time:
+        # Change the delayed packages.
+        i = 1
+        while i <= pc:
+            current_package = packageTable.searchPackage(i)
+            if search('Delayed', current_package[9]):
+                current_package[9] = 'At Hub - Loaded on delivery vehicle'
 
-    # Updates the package address fields.
-    update_package[1] = '410 S State St'
-    update_package[2] = 'Salt Lake City'
-    update_package[3] = 'UT'
-    update_package[4] = '84111'
-    update_package[7] = 'Address corrected'
+            i += 1
+    deliver_packages(truck2, graphSLC, packageTable, endtime)
 
-    # Search through the dictionary to find the address associated with the package to be updated.
-    for key in distance_dict:
+    # Updates the address for package #9 to correct address if the time is past 10:20 AM.
+    change_time = datetime.strptime('10:20 AM', "%I:%M %p")
 
-        # if the address from the package is found, update the address id for the package and break the loop.
-        if update_package[1] in distance_dict[key]['Name']:
-            update_package[10] = key
-            break
-        if update_package[1] in distance_dict[key]['Address']:
-            update_package[10] = key
-            break
+    if end_time >= change_time:
+        # Finds the package ID in the hash table
+        update_package = packageTable.searchPackage(9)
 
-    # Updates the packages in the hash table.
-    packageTable.insertPackage(update_package[0], update_package[1], update_package[2], update_package[3],
-                               update_package[4], update_package[5], update_package[6], update_package[7],
-                               update_package[8], update_package[9], update_package[10])
+        # Updates the package address fields.
+        update_package[1] = '410 S State St'
+        update_package[2] = 'Salt Lake City'
+        update_package[3] = 'UT'
+        update_package[4] = '84111'
+        update_package[7] = 'Address corrected'
+
+        # Search through the dictionary to find the address associated with the package to be updated.
+        for key in distance_dict:
+
+            # if the address from the package is found, update the address id for the package and break the loop.
+            if update_package[1] in distance_dict[key]['Name']:
+                update_package[10] = key
+                break
+            if update_package[1] in distance_dict[key]['Address']:
+                update_package[10] = key
+                break
+
+        # Updates the packages in the hash table.
+        packageTable.insertPackage(update_package[0], update_package[1], update_package[2], update_package[3],
+                                   update_package[4], update_package[5], update_package[6], update_package[7],
+                                   update_package[8], update_package[9], update_package[10])
 
     # Update truck 3 departure time so it is the time that the first truck returns to the hub.
-
     next_departure = min(truck1.truck_time, truck2.truck_time)
 
     if next_departure > datetime.strptime(truck3.truck_time, "%I:%M %p"):
         truck3.truck_time = next_departure.strftime("%I:%M %p")
 
-    deliver_packages(truck3, graphSLC, packageTable)
+    deliver_packages(truck3, graphSLC, packageTable, endtime)
 
     end_time = max(truck1.truck_time, truck2.truck_time, truck3.truck_time)
     total_distance = truck1.distance_traveled + truck2.distance_traveled + truck3.distance_traveled
+    if display_results is True:
+        print("")
+        print("----FINAL RESULT----")
+        print("Total Distance Travelled: ", round(total_distance, 2), "miles")
+        print("Day finished at ", end_time.strftime("%I:%M %p"))
 
-    print("")
-    print("----FINAL RESULT----")
-    print("Total Distance Travelled: ", round(total_distance, 2), "miles")
-    print("Day finished at ", end_time.strftime("%I:%M %p"))
-    # Test code to verify program functionality.
-    # Called from functions written in the test code module.
+    if display_results is False and get_id == 0:
+        print("Package Table at", endtime)
+        packClass.package_print(packageTable)
 
-    # Testing the package loading code
-    # package_deadline(packageTable,pc)
-
-    # manual_load_truck(packageTable, pc)
-
-    # Check the edges and adjacency lists
-    # graph_print(graphSLC)
-
-    # Print the address dictionary one line at a time.
-    # dictionary_print(distance_dict)
-
-    # Prints out the full package table one line at a time.
-    # package_print(packageTable)
-
-    # print(minDist(graphSLC, distance_dict, 5))
-
-    # lookUp(distance_table,distance_dict,8,9)
-
-    # lookUp(distance_table,distance_dict,9,1)
-
-    # lookUp(distance_table,distance_dict,4,15)
-
-    # lookUp(distance_table,distance_dict,6,6)
+    if get_id != 0:
+        display_package = packageTable.searchPackage(get_id)
+        print("Package ID:", display_package[0])
+        print("Address:", display_package[1], "  ", display_package[2], ",", display_package[3], " ", display_package[4])
+        print("Delivery Deadline: ", display_package[5])
+        print("Weight: ", display_package[6])
+        print("Status: ", display_package[9])
