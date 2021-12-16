@@ -18,7 +18,6 @@ class PackageHashTable:
     # Inserts a new package into the hash table.
     def insertPackage(self, id, address, city, state, zip, deadline, mass, notes, truck, status, address_id):
         # get the bucket list where this item will go.
-
         bucket = hash(id) % len(self.table)
         bucket_list = self.table[bucket]
 

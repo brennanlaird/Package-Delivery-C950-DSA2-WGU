@@ -1,7 +1,6 @@
 from datetime import timedelta, datetime
 from re import search
 
-import status_output
 from distanceLookup import next_nearest
 from packHash import *
 from packClass import *
@@ -82,33 +81,13 @@ def deliver_packages(truck, graph, pack_table, endtime):
         # Sets the current time based on the travel time. Travel time is converted into minutes.
         current_time = current_time + timedelta(minutes=travel_time * 60)
 
-        # Triggers a function to print the package status to a file at a given time.
-        # Hard codes trigger times based on the performance assessment rubric.
-        # Section G1 - Time between 8:35 and 9:25 AM
-        trigger_time1 = datetime.strptime('8:45 AM', "%I:%M %p")
-
-        # Section G2 - Time between 9:35 and 10:25 AM
-        trigger_time2 = datetime.strptime('9:45 AM', "%I:%M %p")
-
-        # Section G3 - Time between 12:03 and 1:12 PM
-        trigger_time3 = datetime.strptime('12:10 PM', "%I:%M %p")
-
+        # Sets a temporary truck time.
+        # This allows the code to stop execution when the user input trigger time has passed.
         temp_truck_time = current_time - timedelta(minutes=travel_time * 60)
-        # print(type(truck.truck_time))
 
         # if the current time passes the desired end time then return to the calling function.
         if current_time >= end_time > temp_truck_time:
-            print("This triggered")
             return
-
-        if current_time >= trigger_time1 > temp_truck_time:
-            status_output.print_status(current_time, pack_table, truck, trigger_time1, trigger_time2, trigger_time3)
-
-        if current_time >= trigger_time2 > temp_truck_time:
-            status_output.print_status(current_time, pack_table, truck, trigger_time1, trigger_time2, trigger_time3)
-
-        if current_time >= trigger_time3 > temp_truck_time:
-            status_output.print_status(current_time, pack_table, truck, trigger_time1, trigger_time2, trigger_time3)
 
         # Sets the truck time to match the current time.
         truck.truck_time = current_time
@@ -140,8 +119,6 @@ def deliver_packages(truck, graph, pack_table, endtime):
     current_time = current_time + timedelta(minutes=travel_time * 60)
     truck.truck_time = current_time
 
-    # print("Truck", truck.truck_id, "travelled", round(truck.distance_traveled, 2), "miles.")
-
 
 # Defines a manual scheme for loading trucks.
 def manual_load_truck(pack_table, pc):
@@ -161,7 +138,7 @@ def manual_load_truck(pack_table, pc):
         # Sets the truck ID from the truck loading scheme based on the index of that list.
         current_package[8] = truck_loading[current_id - 1]
 
-        # Sets the package status.
+        # Sets the package status. If it is reported as delayed, it cannot be loaded on the truck.
         if search('Delayed', current_package[7]):
             current_package[9] = 'Delayed'
         else:

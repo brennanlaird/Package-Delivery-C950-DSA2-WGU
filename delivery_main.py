@@ -8,6 +8,10 @@ from packHash import *
 from truckClass import *
 
 
+# The main delivery function. It can take several parameters that allow it to display results in different ways.
+# The end time is a string that is parsed into a datetime. This allows the function to stop running and display results
+# at a user specified time. Display results will cause the full package table to display. The get id parameter will
+# display the results of a single package if it is not 0.
 def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
     # Creates a new empty package hash table.
     packageTable = PackageHashTable()
@@ -141,20 +145,14 @@ def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
     truck2 = Truck(2, 0, 18, 16, [], 0, '9:05 AM')
     truck3 = Truck(3, 0, 18, 16, [], 0, '10:20 AM')
 
+    # Calls the manual distribute function to distribute the packages to their respective trucks.
     manual_distribute(truck1, packageTable, pc)
     manual_distribute(truck2, packageTable, pc)
     manual_distribute(truck3, packageTable, pc)
 
-    # for item in truck3.truck_content:
-    # print(item)
-
-    # load_truck(truck1, packageTable)
-    # load_truck(truck2, packageTable)
-    # load_truck(truck3, packageTable)
-
-    # print(truck1.truck_content)
-
+    # Executes the deliver packages function for truck 1.
     deliver_packages(truck1, graphSLC, packageTable, endtime)
+
 
     # Change the status of the delayed packages to loaded if the time is past the delayed arrival time.
 
@@ -162,15 +160,21 @@ def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
     end_time = datetime.strptime(endtime, "%I:%M %p")
     delay_time = datetime.strptime('9:05 AM', "%I:%M %p")
 
+    # If the end time is after the delayed time then the delayed packages will have arrived.
     if end_time >= delay_time:
-        # Change the delayed packages.
+        # Change the delayed packages' status to loaded if they have arrived.
+        # Start at package id 1
         i = 1
+        # While package id is less than the package count.
         while i <= pc:
+            # Get the package id from the hash table.
             current_package = packageTable.searchPackage(i)
+            # If the note field contains delayed, adjust the status to show it has arrived and was loaded.
             if search('Delayed', current_package[9]):
                 current_package[9] = 'At Hub - Loaded on delivery vehicle'
-
             i += 1
+
+    # Execute the deliver packages function for truck 2.
     deliver_packages(truck2, graphSLC, packageTable, endtime)
 
     # Updates the address for package #9 to correct address if the time is past 10:20 AM.
@@ -203,30 +207,49 @@ def delivery_main(endtime='11:59 PM', display_results=True, get_id=0):
                                    update_package[4], update_package[5], update_package[6], update_package[7],
                                    update_package[8], update_package[9], update_package[10])
 
-    # Update truck 3 departure time so it is the time that the first truck returns to the hub.
+    # Update truck 3 departure time to the time that the first truck returns to the hub.
+    # This accounts for only having two drivers.
     next_departure = min(truck1.truck_time, truck2.truck_time)
 
+    # If the next departure is after the designated departure time for truck 3, reset the truck 3 time to later.
     if next_departure > datetime.strptime(truck3.truck_time, "%I:%M %p"):
         truck3.truck_time = next_departure.strftime("%I:%M %p")
 
+    # Execute the deliver packages function for truck 3.
     deliver_packages(truck3, graphSLC, packageTable, endtime)
 
+    # Find the time the last truck returns to the hub.
     end_time = max(truck1.truck_time, truck2.truck_time, truck3.truck_time)
+
+    # Find the total distance that the trucks travelled.
     total_distance = truck1.distance_traveled + truck2.distance_traveled + truck3.distance_traveled
+
+    # if display results is true, show the final totals.
     if display_results is True:
         print("")
         print("----FINAL RESULT----")
         print("Total Distance Travelled: ", round(total_distance, 2), "miles")
         print("Day finished at ", end_time.strftime("%I:%M %p"))
 
+    # If display results is false and there is no specific package id, display the full package table.
     if display_results is False and get_id == 0:
+        # Print a header and the time.
         print("Package Table at", endtime)
+        # Print the table one line at a time with the package_print function.
         packClass.package_print(packageTable)
 
+    # if there is a specific package, look for it in the hash table and display the output.
     if get_id != 0:
+        # Search for the package in the table.
         display_package = packageTable.searchPackage(get_id)
-        print("Package ID:", display_package[0])
-        print("Address:", display_package[1], "  ", display_package[2], ",", display_package[3], " ", display_package[4])
-        print("Delivery Deadline: ", display_package[5])
-        print("Weight: ", display_package[6])
-        print("Status: ", display_package[9])
+        # Display the results if found.
+        if display_package is not None:
+            print("Package ID:", display_package[0])
+            print("Address:", display_package[1], "  ", display_package[2], ",", display_package[3], " ",
+                  display_package[4])
+            print("Delivery Deadline: ", display_package[5])
+            print("Weight: ", display_package[6])
+            print("Status: ", display_package[9])
+        # Display the results if nothing is found.
+        else:
+            print("Package", get_id, "was not found.")

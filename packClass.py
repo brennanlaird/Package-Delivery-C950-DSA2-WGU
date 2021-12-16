@@ -1,4 +1,3 @@
-
 class Package:
     # Define the package constructor based on the headers from the provided Excel file.
     # Additional parameters are for the truck to load the package, delivery status, and address ID.
@@ -16,8 +15,12 @@ class Package:
         self.address_id = address_id
 
 
+# Function to print each package in the table.
 def package_print(packtable):
-    pc = 1
-    while pc < 41:
-        print(packtable.searchPackage(pc))
-        pc += 1
+    # Set package id to 1.
+    p_id = 1
+    # Loop through each package of the 40 package ids.
+    while p_id < 41:
+        # Search the hash table for the id and print the results.
+        print(packtable.searchPackage(p_id))
+        p_id += 1
