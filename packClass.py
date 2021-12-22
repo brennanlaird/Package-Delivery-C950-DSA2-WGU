@@ -23,5 +23,8 @@ def package_print(packtable):
     # Loop through each package of the 40 package ids.
     while p_id < 41:
         # Search the hash table for the id and print the results.
-        print(packtable.searchPackage(p_id))
+        # print(packtable.searchPackage(p_id))
+        cp = packtable.searchPackage(p_id)
+        print("ID:", cp[0], " Address:", cp[1], cp[2], cp[3], cp[4], "Deadline:", cp[5],
+              "Truck", cp[8], "Weight: ", cp[6],  "Status:", cp[9])
         p_id += 1

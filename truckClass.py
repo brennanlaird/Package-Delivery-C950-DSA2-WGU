@@ -108,12 +108,19 @@ def deliver_packages(truck, graph, pack_table, endtime):
 
     # Return the truck to the hub.
     # Add the distance from the last stop back to the hub and set the location to the hub.
-    truck.distance_traveled = graph.edge_weights.get(truck.currentLocation, 0) + truck.distance_traveled
+
+    # Get the next location pair to pull from the graph
+    next_pair = 0, truck.currentLocation
+
+    # Pull the distance (edge weight) of the pair from the graph.
+    distance_to_next = graph.edge_weights.get(next_pair)
+
+    truck.distance_traveled = distance_to_next + truck.distance_traveled
     truck.currentLocation = 0
 
     # Update the truck time
     # Computes travel time in hours.
-    travel_time = graph.edge_weights.get(truck.currentLocation, 0) / truck.speed
+    travel_time = distance_to_next/ truck.speed
 
     # Sets the current time based on the travel time. Travel time is converted into minutes.
     current_time = current_time + timedelta(minutes=travel_time * 60)
